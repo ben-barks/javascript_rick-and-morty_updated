@@ -2,20 +2,24 @@ const RequestHelper = require('../helpers/request_helper.js');
 const PubSub = require('../helpers/pub_sub.js')
 const CharacterListView = require('./character_list_view.js')
 
-const CharacterView = function(container){
+const CharacterView = function(container, character){
   this.container = container;
+  this.character = character;
 };
 
 CharacterView.prototype.bindEvents = function () {
+  PubSub.subscribe('Chars:all-chars-ready', (evt) => {
+    const allChars = evt.detail;
+    this.renderHome(allChars)
+  });
   PubSub.subscribe('Chars:selected-ready', (evt) => {
     const character = evt.detail;
+    this.container.innerHTML = '';
     this.render(character);
   });
 };
 
 CharacterView.prototype.render = function (character) {
-  this.container.innerHTML = '';
-
   const characterContainer = document.createElement('div');
   characterContainer.classList.add('character-container');
 
@@ -40,6 +44,16 @@ CharacterView.prototype.render = function (character) {
   this.container.appendChild(characterContainer);
 };
 
+CharacterView.prototype.renderHome = function (characters) {
+  const charactersContainer = document.createElement('div');
+  charactersContainer.classList.add('all-chars-container');
+
+  const images = this.createCharacterList();
+  charactersContainer.appendChild(images);
+
+  this.container.appendChild(charactersContainer);
+};
+
 CharacterView.prototype.createContentHeading = function (name) {
   const heading = document.createElement('h3');
   heading.classList.add('character-name');
@@ -59,6 +73,22 @@ CharacterView.prototype.createImg = function (src) {
   img.classList.add('character-image');
   img.src = src;
   return img;
+};
+
+
+CharacterView.prototype.createCharacterList = function () {
+  const charactersList = document.createElement('ul');
+  charactersList.classList.add('characters');
+  this.populateList(charactersList);
+  return charactersList;
+};
+
+CharacterView.prototype.populateList = function (list) {
+  this.character.forEach((char) => {
+    const characterListItem = document.createElement('li');
+    characterListItem.src = character.image;
+    list.appendChild(characterListItem);
+  });
 };
 
 module.exports = CharacterView;

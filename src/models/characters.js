@@ -13,7 +13,6 @@ Characters.prototype.getData = function () {
   }))
     .then((characters) => {
       const flattened = characters.flat(1);
-      console.log(flattened);
 
       const temp = flattened.reduce((sum, x) => {
         // x.results.forEach((char) => {
@@ -22,14 +21,18 @@ Characters.prototype.getData = function () {
         sum.push.apply(sum, x.results);
         return sum;
       },[]);
-      console.log('temp:', temp);
 
       this.characterList = temp;
       const allChars = [];
+      const allCharacters = [];
       let names = this.characterList.forEach((character) => {
         allChars.push(character.name)
       })
+      let chars = this.characterList.forEach((character) => {
+        allCharacters.push(character)
+      })
       PubSub.publish('Chars:ready', allChars)
+      PubSub.publish('Chars:all-chars-ready', allCharacters)
     })
     .catch(() => {
 
