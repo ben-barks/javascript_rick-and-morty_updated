@@ -41,9 +41,13 @@ Characters.prototype.getData = function () {
 
 Characters.prototype.bindEvents = function () {
   PubSub.subscribe('CharsSelV:selected', (evt) => {
+    if (evt.detail === 'all') {
+      PubSub.publish('Chars:selected-ready', null);
+      return;
+    }
+    
     const selectedIndex = evt.detail;
     const selectedCharacter = this.characterList[selectedIndex];
-    // send character wherever
     PubSub.publish('Chars:selected-ready', selectedCharacter)
   });
 };

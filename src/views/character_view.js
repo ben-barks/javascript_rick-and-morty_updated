@@ -1,6 +1,5 @@
 const RequestHelper = require('../helpers/request_helper.js');
 const PubSub = require('../helpers/pub_sub.js')
-const CharacterListView = require('./character_list_view.js')
 
 const CharacterView = function(container, character){
   this.container = container;
@@ -9,52 +8,50 @@ const CharacterView = function(container, character){
 
 CharacterView.prototype.bindEvents = function () {
   PubSub.subscribe('Chars:all-chars-ready', (evt) => {
-    const allChars = evt.detail;
+    this.allChars = evt.detail;
     this.container.innerHTML = '';
-    this.renderHome(allChars)
+    this.renderAll();
   });
   PubSub.subscribe('Chars:selected-ready', (evt) => {
-    const character = evt.detail;
     this.container.innerHTML = '';
-    this.render(character);
+    if (evt.detail){
+      const character = evt.detail;
+      this.render(character);
+    } else {
+      this.renderAll();
+    }
   });
 };
 
-CharacterView.prototype.render = function (character) {
-  const characterContainer = document.createElement('div');
-  characterContainer.classList.add('character-container');
-
-  const name = this.createContentHeading(character.name);
-  characterContainer.appendChild(name);
-
-  const status = this.createPara('Status', character.status);
-  characterContainer.appendChild(status);
-
-  const species = this.createPara('Species', character.species);
-  characterContainer.appendChild(species);
-
-  const gender = this.createPara('Gender', character.gender);
-  characterContainer.appendChild(gender);
-
-  const origin = this.createPara('Origin', character.origin.name);
-  characterContainer.appendChild(origin);
-
-  const image = this.createImg(character.image);
-  characterContainer.appendChild(image);
-
-  this.container.appendChild(characterContainer);
-};
-
-CharacterView.prototype.renderHome = function (characters) {
+CharacterView.prototype.render = function (char) {
   const charactersContainer = document.createElement('div');
   charactersContainer.classList.add('all-chars-container');
 
-  characters.forEach((char) => {
-    const image = this.createImg(char.image);
-    charactersContainer.appendChild(image);
+  const name = this.createPara('Name', char.name);
+  charactersContainer.appendChild(name);
 
-    this.container.appendChild(charactersContainer);
-  })
+  const status = this.createPara('Status', char.status);
+  charactersContainer.appendChild(status);
+
+  const species = this.createPara('Species', char.species);
+  charactersContainer.appendChild(species);
+
+  const gender = this.createPara('Gender', char.gender);
+  charactersContainer.appendChild(gender);
+
+  const origin = this.createPara('Origin', char.origin.name);
+  charactersContainer.appendChild(origin);
+
+  const image = this.createImg(char.image);
+  charactersContainer.appendChild(image);
+
+  this.container.appendChild(charactersContainer);
+};
+
+CharacterView.prototype.renderAll = function () {
+  this.allChars.forEach((char) => {
+    this.render(char);
+  });
 };
 
 CharacterView.prototype.createContentHeading = function (name) {
@@ -93,5 +90,6 @@ CharacterView.prototype.populateList = function (list) {
     list.appendChild(characterListItem);
   });
 };
+
 
 module.exports = CharacterView;

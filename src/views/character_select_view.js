@@ -13,6 +13,7 @@ CharacterSelectView.prototype.bindEvents = function () {
       option.value = index;
       this.container.appendChild(option);
     });
+    
     this.container.addEventListener('change', (evt) => {
       const selectedChar = evt.target.value;
       PubSub.publish('CharsSelV:selected', selectedChar)
