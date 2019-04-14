@@ -10,6 +10,7 @@ const CharacterView = function(container, character){
 CharacterView.prototype.bindEvents = function () {
   PubSub.subscribe('Chars:all-chars-ready', (evt) => {
     const allChars = evt.detail;
+    this.container.innerHTML = '';
     this.renderHome(allChars)
   });
   PubSub.subscribe('Chars:selected-ready', (evt) => {
@@ -26,16 +27,16 @@ CharacterView.prototype.render = function (character) {
   const name = this.createContentHeading(character.name);
   characterContainer.appendChild(name);
 
-  const status = this.createPara('status', character.status);
+  const status = this.createPara('Status', character.status);
   characterContainer.appendChild(status);
 
-  const species = this.createPara('species', character.species);
+  const species = this.createPara('Species', character.species);
   characterContainer.appendChild(species);
 
-  const gender = this.createPara('gender', character.gender);
+  const gender = this.createPara('Gender', character.gender);
   characterContainer.appendChild(gender);
 
-  const origin = this.createPara('origin', character.origin.name);
+  const origin = this.createPara('Origin', character.origin.name);
   characterContainer.appendChild(origin);
 
   const image = this.createImg(character.image);
@@ -48,10 +49,12 @@ CharacterView.prototype.renderHome = function (characters) {
   const charactersContainer = document.createElement('div');
   charactersContainer.classList.add('all-chars-container');
 
-  const images = this.createCharacterList();
-  charactersContainer.appendChild(images);
+  characters.forEach((char) => {
+    const image = this.createImg(char.image);
+    charactersContainer.appendChild(image);
 
-  this.container.appendChild(charactersContainer);
+    this.container.appendChild(charactersContainer);
+  })
 };
 
 CharacterView.prototype.createContentHeading = function (name) {
